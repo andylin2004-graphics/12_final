@@ -93,6 +93,7 @@ FRAMES_D = {FRAMES ~ DOUBLE}
 
 VARY = _{"vary"}
 VARY_SDDDD = {VARY ~ STRING ~ DOUBLE{4}}
+VARY_SDDDDD = {VARY ~ STRING ~ DOUBLE{5}}
 
 PPUSH = {"push"}
 PPOP = {"pop"}
@@ -118,6 +119,7 @@ IDENT_LIST = _{
     SOI ~ 
     ((
         FRAMES_D |
+        VARY_SDDDDD |
         VARY_SDDDD |
         LIGHT_SDDDDDD |
         CONSTANTS_SDDDDDDDDDDDD |

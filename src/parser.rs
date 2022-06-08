@@ -91,7 +91,7 @@ pub fn parse(fname: &str) {
                 Rule::BASENAME => {
                     println!("WARNING: a default basename will be used instead because basename is missing at {}", error_message);
                 }
-                Rule::VARY_SDDDD => {
+                Rule::VARY_SDDDD | Rule::VARY_SDDDDD => {
                     vary_exists = true;
                 }
                 _ => {}
@@ -108,7 +108,7 @@ pub fn parse(fname: &str) {
                 for command in pair {
                     let error_message = command.as_str();
                     match command.as_rule() {
-                        Rule::VARY_SDDDD => {
+                        Rule::VARY_SDDDD | Rule::VARY_SDDDDD => {
                             let mut command_contents = command.into_inner();
                             let knob_name = command_contents.next().unwrap().as_str();
                             let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start frame number at {}", error_message));
@@ -120,11 +120,17 @@ pub fn parse(fname: &str) {
                             let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start knob value at {}", error_message));
                             let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end knob value at {}", error_message));
                             let frame_count = end_frame - start_frame;
+                            let power_used: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a power value at {}", error_message));
                             let mut current_value = start_value;
                             let change_in_value = (end_value - start_value) / frame_count as f32;
                             for frame_num in start_frame..=end_frame{
-                                frames[frame_num as usize].insert(knob_name, current_value);
-                                current_value += change_in_value;
+                                if power_used == 1.0{
+                                    frames[frame_num as usize].insert(knob_name, current_value);
+                                    current_value += change_in_value;
+                                }else{
+                                    let frame_result = ((1.0/frame_count as f32) * frame_num as f32).powf(power_used);
+                                    frames[frame_num as usize].insert(knob_name, frame_result);
+                                }
                             }
                         }
                         _ => {}
@@ -416,7 +422,7 @@ pub fn parse(fname: &str) {
         
                         edges = Matrix::new(0, 0);
                     }
-                    Rule::EOI | Rule::VARY_SDDDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
+                    Rule::EOI | Rule::VARY_SDDDD | Rule::VARY_SDDDDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
                     _ => {
                         println!("{:?} was not implemented :/", command.as_rule());
                     }
