@@ -130,10 +130,11 @@ pub fn parse(fname: &str) {
                                 if power_used == 1.0{
                                     frames[frame_num as usize].insert(knob_name, current_value);
                                     current_value += change_in_value;
+                                }else if end_value - start_value == 0.0{
+                                    frames[frame_num as usize].insert(knob_name, start_value);
                                 }else{
                                     let frame_result = ((1.0/frame_count as f32) * (frame_num - start_frame) as f32).powf(power_used);
                                     frames[frame_num as usize].insert(knob_name, frame_result);
-                                    println!("{}, {}", frame_num, frame_result);
                                 }
                             }
                         }
@@ -434,6 +435,7 @@ pub fn parse(fname: &str) {
             }
         }
         if frames.len() > 1{
+            // println!("{:?}", frames[frame_num]);
             render_reset_image_canvas(&basename, frame_num, &mut screen, &mut edges, &mut polygons, &mut cstack);
         }
     }
