@@ -120,7 +120,10 @@ pub fn parse(fname: &str) {
                             let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start knob value at {}", error_message));
                             let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end knob value at {}", error_message));
                             let frame_count = end_frame - start_frame;
-                            let power_used: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a power value at {}", error_message));
+                            let mut power_used: f32 = 1.0;
+                            if let Some(power_input) = command_contents.next(){
+                                power_used = power_input.as_str().parse().expect(&*format!("Not a valid power value at {}", error_message));
+                            }
                             let mut current_value = start_value;
                             let change_in_value = (end_value - start_value) / frame_count as f32;
                             for frame_num in start_frame..=end_frame{
@@ -128,8 +131,9 @@ pub fn parse(fname: &str) {
                                     frames[frame_num as usize].insert(knob_name, current_value);
                                     current_value += change_in_value;
                                 }else{
-                                    let frame_result = ((1.0/frame_count as f32) * frame_num as f32).powf(power_used);
+                                    let frame_result = ((1.0/frame_count as f32) * (frame_num - start_frame) as f32).powf(power_used);
                                     frames[frame_num as usize].insert(knob_name, frame_result);
+                                    println!("{}, {}", frame_num, frame_result);
                                 }
                             }
                         }
