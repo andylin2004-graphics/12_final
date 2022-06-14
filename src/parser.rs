@@ -427,6 +427,13 @@ pub fn parse(fname: &str) {
         
                         edges = Matrix::new(0, 0);
                     }
+                    Rule::SAVE_COORDS_S => {
+                        if let Some(name_canidate) = command.into_inner().next() {
+                            csystems.insert(name_canidate, cstack.last().unwrap());
+                        }else{
+                            println!("ERROR: no name passed in for {}", error_message);
+                        }
+                    }
                     Rule::EOI | Rule::VARY_SDDDD | Rule::VARY_SDDDDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
                     _ => {
                         println!("{:?} was not implemented :/", command.as_rule());
