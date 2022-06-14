@@ -65,7 +65,8 @@ pub fn parse(fname: &str) {
     let color = Color::new_color(0, 255, 0);
     let mut edges = Matrix::new(0, 0);
     let mut polygons = Matrix::new(0, 0);
-    let mut cstack = vec![Matrix::new(0, 0); 0];
+    let mut cstack = vec![&Matrix::new(0,0); 0];
+    let mut csystems = HashMap::new();
     let mut constants_store = HashMap::new();
     let mut basename = String::from("output");
     let mut vary_exists = false;
@@ -73,7 +74,7 @@ pub fn parse(fname: &str) {
     let mut frames: Vec<HashMap<&str, f32>> = vec![HashMap::new()];
 
     clean_animation_directory();
-    cstack.push(Matrix::identity());
+    cstack.push(&Matrix::identity());
     // to get the frame rate
     for pair in commands.clone() {
         for command in pair {
@@ -170,7 +171,7 @@ pub fn parse(fname: &str) {
                     }
                     Rule::MOVE_DDD | Rule::MOVE_DDDS => {
                         let mut command_contents = command.into_inner();
-                        let mut translate = Matrix::make_translate_with_scale(
+                        let mut translate = &Matrix::make_translate_with_scale(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -200,17 +201,17 @@ pub fn parse(fname: &str) {
                         }
                         match rot_axis {
                             "x" => {
-                                let mut rot = Matrix::make_rot_x(rot_amount);
+                                let mut rot = &Matrix::make_rot_x(rot_amount);
                                 rot.multiply_matrixes(&cstack.pop().unwrap());
                                 cstack.push(rot);
                             }
                             "y" => {
-                                let mut rot = Matrix::make_rot_y(rot_amount);
+                                let mut rot = &Matrix::make_rot_y(rot_amount);
                                 rot.multiply_matrixes(&cstack.pop().unwrap());
                                 cstack.push(rot);
                             }
                             "z" => {
-                                let mut rot = Matrix::make_rot_z(rot_amount);
+                                let mut rot = &Matrix::make_rot_z(rot_amount);
                                 rot.multiply_matrixes(&cstack.pop().unwrap());
                                 cstack.push(rot);
                             }
@@ -224,7 +225,7 @@ pub fn parse(fname: &str) {
                     }
                     Rule::SCALE_DDD | Rule::SCALE_DDDS => {
                         let mut command_contents = command.into_inner();
-                        let mut scale = Matrix::make_scale_with_scale(
+                        let mut scale = &Matrix::make_scale_with_scale(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -451,15 +452,15 @@ pub fn parse(fname: &str) {
     }
 }
 
-fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<Matrix>){
+fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<&Matrix>){
     let filename = "animation/".to_owned() + &filename + &*format!("{:04}", frame_num) + ".ppm";
     screen.create_file(&*filename);
     println!("Rendering {}...", filename);
     screen.clear();
     *edges = Matrix::new(0, 0);
     *polygons = Matrix::new(0, 0);
-    *cstack = vec![Matrix::new(0, 0); 0];
-    cstack.push(Matrix::identity());
+    cstack = vec![&Matrix::new(0, 0); 0];
+    cstack.push(&Matrix::identity());
 }
 
 fn clean_animation_directory(){
