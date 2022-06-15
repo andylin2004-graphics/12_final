@@ -8,6 +8,7 @@
 - Exponential and custom equation based vary for change over time
 - vary to change intensity of constants light values
 - allow user to save a coordinate system into the symbol table
+- allow user to push a saved coordinate system into the symbol table
 ---
 ## The Details
 - for vary, I would be able to pass in an arbitrary equation or a exponential or higher power equation based on the inputs placed in (equation or coefficient and power amount)
