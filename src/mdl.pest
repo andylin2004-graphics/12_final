@@ -99,6 +99,8 @@ VARY_SDDDDD = {VARY ~ STRING ~ DOUBLE{5}}
 VARY_SDDEDD = {VARY ~ STRING ~ DOUBLE{2} ~ EQUATION ~ DOUBLE{2}}
 
 PPUSH = {"push"}
+PPUSH_S = {PPUSH ~ STRING}
+
 PPOP = {"pop"}
 
 SAVE = _{"save"}
@@ -158,6 +160,7 @@ IDENT_LIST = _{
         SET_SD |
         MOVE_DDDS |
         MOVE_DDD |
+        PPUSH_S |
         PPUSH |
         PPOP |
         TWEEN_DDSS |

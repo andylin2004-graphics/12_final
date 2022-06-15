@@ -68,7 +68,7 @@ pub fn parse(fname: &str) {
     let mut edges = Matrix::new(0, 0);
     let mut polygons = Matrix::new(0, 0);
     let mut cstack = vec![Matrix::new(0, 0); 0];
-    let mut csystems = HashMap::new();
+    let mut csystems: HashMap<&str, Matrix> = HashMap::new();
     let mut constants_store = HashMap::new();
     let mut basename = String::from("output");
     let mut vary_exists = false;
@@ -202,6 +202,12 @@ pub fn parse(fname: &str) {
                     // }
                     Rule::PPUSH => {
                         cstack.push(cstack.last().unwrap().clone());
+                    }
+                    Rule::PPUSH_S => {
+                        let mut command_contents = command.into_inner();
+                        let name = command_contents.nth(1).unwrap().as_str();
+                        let matrix = csystems.get(name).unwrap().clone();
+                        cstack.push(matrix);
                     }
                     Rule::PPOP => {
                         cstack.pop();
