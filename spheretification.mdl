@@ -12,5 +12,8 @@ sphere 0 0 0 80 basic_one
 push basic_one
 move 0 340 0
 sphere 0 0 0 80
+push
+move 340 0 0
+sphere 0 0 0 80
 save ratio.ppm
 display
