@@ -17,7 +17,7 @@ use std::io::{BufReader, Read};
 struct MDLParser;
 
 #[derive(Debug)]
-struct Constants {
+struct Constant {
     pub ambient_reflect: ReflectionValue,
     pub diffuse_reflect: ReflectionValue,
     pub specular_reflect: ReflectionValue,
@@ -26,7 +26,7 @@ struct Constants {
     pub blue: f32,
 }
 
-impl Constants {
+impl Constant {
     fn new(
         ambient_red: f32,
         diffuse_red: f32,
@@ -40,8 +40,8 @@ impl Constants {
         red: f32,
         green: f32,
         blue: f32,
-    ) -> Constants {
-        Constants {
+    ) -> Constant {
+        Constant {
             ambient_reflect: ReflectionValue::new_values(ambient_red, ambient_green, ambient_blue),
             diffuse_reflect: ReflectionValue::new_values(diffuse_red, diffuse_green, diffuse_blue),
             specular_reflect: ReflectionValue::new_values(
@@ -182,7 +182,14 @@ pub fn parse(fname: &str) {
                     Rule::CONSTANTS_SDDDDDDDDD => {
                         let mut command_contents = command.into_inner();
                         let name = command_contents.next().unwrap().as_str();
-                        let constant = Constants::new(command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), 0.0, 0.0, 0.0);
+                        let constant = Constant::new(command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), 0.0, 0.0, 0.0);
+                        constants_store.insert(name, constant);
+                    }
+                    Rule::CONSTANTS_SSDDDDDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        let name = command_contents.next().unwrap().as_str();
+                        let vary_value = frames[frame_num].get(command_contents.next().unwrap().as_str()).expect("Unable to get constants");
+                        let constant = Constant::new(command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, 0.0, 0.0, 0.0);
                         constants_store.insert(name, constant);
                     }
                     // Rule::CONSTANTS_SDDDDDDDDDDDD => {
@@ -505,7 +512,7 @@ pub fn parse(fname: &str) {
         }
         if frames.len() > 1{
             // println!("{:?}", frames[frame_num]);
-            render_reset_image_canvas(&basename, frame_num, &mut screen, &mut edges, &mut polygons, &mut cstack);
+            render_reset_image_canvas(&basename, frame_num, &mut screen, &mut edges, &mut polygons, &mut cstack, &mut constants_store);
         }
     }
     if frames.len() > 1{
@@ -513,7 +520,7 @@ pub fn parse(fname: &str) {
     }
 }
 
-fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<Matrix>){
+fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<Matrix>, constants_store: &mut HashMap<&str, Constant>){
     let filename = "animation/".to_owned() + &filename + &*format!("{:04}", frame_num) + ".ppm";
     screen.create_file(&*filename);
     println!("Rendering {}...", filename);
@@ -522,6 +529,7 @@ fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Imag
     *polygons = Matrix::new(0, 0);
     *cstack = vec![Matrix::new(0, 0); 0];
     cstack.push(Matrix::identity());
+    constants_store.clear();
 }
 
 fn clean_animation_directory(){
