@@ -11,7 +11,7 @@ DOUBLE = @{("-"? ~ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+) |
 ("-"? ~ ASCII_DIGIT+ ~ ".") |
 ("-"? ~ ASCII_DIGIT+) |
 ("-"? ~ "." ~ ASCII_DIGIT+)}
-EQUATION = @{(ASCII_ALPHANUMERIC | SYMBOL | PUNCTUATION | "{}")+}
+EQUATION = @{(ASCII_ALPHANUMERIC | SYMBOL | PUNCTUATION | "{frame_num}")+}
 
 LIGHT = _{"light"}
 LIGHT_SDDDDDD = {LIGHT ~ STRING ~ DOUBLE{6}}
