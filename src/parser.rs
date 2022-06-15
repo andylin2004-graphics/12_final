@@ -242,7 +242,7 @@ pub fn parse(fname: &str) {
                         scale.multiply_matrixes(&cstack.pop().unwrap());
                         cstack.push(scale);
                     }
-                    Rule::SPHERE_SDDDD => {
+                    Rule::SPHERE_SDDDD | Rule::SPHERE_SDDDDS => {
                         // println!("{:?}", command);
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
@@ -253,7 +253,13 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D,
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
+                        
                         screen.draw_polygons(
                             &polygons,
                             &color,
@@ -268,7 +274,7 @@ pub fn parse(fname: &str) {
     
                         polygons = Matrix::new(0, 0);
                     }
-                    Rule::SPHERE_DDDD => {
+                    Rule::SPHERE_DDDD | Rule::SPHERE_DDDDS => {
                         let mut command_contents = command.into_inner();
                         polygons.add_sphere(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -277,7 +283,13 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D,
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
+
                         screen.draw_polygons(
                             &polygons,
                             &color,
@@ -292,7 +304,7 @@ pub fn parse(fname: &str) {
     
                         polygons = Matrix::new(0, 0);
                     }
-                    Rule::BOX_SDDDDDD => {
+                    Rule::BOX_SDDDDDD | Rule::BOX_SDDDDDDS => {
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
                         polygons.add_box(
@@ -303,7 +315,12 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message)
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
     
                         screen.draw_polygons(
                             &polygons,
@@ -319,7 +336,7 @@ pub fn parse(fname: &str) {
     
                         polygons = Matrix::new(0, 0);
                     }
-                    Rule::BOX_DDDDDD => {
+                    Rule::BOX_DDDDDD | Rule::BOX_DDDDDDS => {
                         let mut command_contents = command.into_inner();
                         polygons.add_box(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -329,7 +346,13 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message)
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
+
                         screen.draw_polygons(
                             &polygons,
                             &color,
@@ -344,7 +367,7 @@ pub fn parse(fname: &str) {
     
                         polygons = Matrix::new(0, 0);
                     }
-                    Rule::TORUS_SDDDDD => {
+                    Rule::TORUS_SDDDDD | Rule::TORUS_SDDDDDS => {
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
                         polygons.add_torus(
@@ -355,7 +378,13 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
+
                         screen.draw_polygons(
                             &polygons,
                             &color,
@@ -370,7 +399,7 @@ pub fn parse(fname: &str) {
     
                         polygons = Matrix::new(0, 0);
                     }
-                    Rule::TORUS_DDDDD => {
+                    Rule::TORUS_DDDDD | Rule::TORUS_DDDDDS => {
                         let mut command_contents = command.into_inner();
                         polygons.add_torus(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -380,7 +409,11 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D
                         );
-                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        if let Some(coord_system) = command_contents.next(){
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                        }else{
+                            polygons.multiply_matrixes(cstack.last().unwrap());
+                        }
                         screen.draw_polygons(
                             &polygons,
                             &color,
@@ -430,7 +463,7 @@ pub fn parse(fname: &str) {
                     }
                     Rule::SAVE_COORDS_S => {
                         if let Some(name_canidate) = command.into_inner().next() {
-                            csystems.insert(name_canidate, cstack.last().unwrap().clone());
+                            csystems.insert(name_canidate.as_str(), cstack.last().unwrap().clone());
                         }else{
                             println!("ERROR: no name passed in for {}", error_message);
                         }
