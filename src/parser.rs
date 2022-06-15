@@ -1,3 +1,5 @@
+use shunting::*;
+use strfmt::*;
 use std::process::Command;
 use crate::color::Color;
 use crate::consts;
@@ -92,7 +94,7 @@ pub fn parse(fname: &str) {
                 Rule::BASENAME => {
                     println!("WARNING: a default basename will be used instead because basename is missing at {}", error_message);
                 }
-                Rule::VARY_SDDDD | Rule::VARY_SDDDDD => {
+                Rule::VARY_SDDDD | Rule::VARY_SDDDDD | Rule::VARY_SDDEDD => {
                     vary_exists = true;
                 }
                 _ => {}
@@ -136,6 +138,32 @@ pub fn parse(fname: &str) {
                                 }else{
                                     let frame_result = ((1.0/frame_count as f32) * (frame_num - start_frame) as f32).powf(power_used);
                                     frames[frame_num as usize].insert(knob_name, frame_result);
+                                }
+                            }
+                        }
+                        Rule::VARY_SDDEDD => {
+                            let mut command_contents = command.into_inner();
+                            let knob_name = command_contents.next().unwrap().as_str();
+                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start frame number at {}", error_message));
+                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end frame number at {}", error_message));
+                            if end_frame < start_frame {
+                                println!("ERROR: start frame number is greater than end frame number at {}", error_message);
+                                return;
+                            }
+                            let equation = command_contents.next().unwrap().as_str();
+                            let min_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start knob value at {}", error_message));
+                            let max_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end knob value at {}", error_message));
+                            let frame_count = end_frame - start_frame;
+                            let fmt_map = HashMap::new();
+                            for frame_num in start_frame..=end_frame{
+                                let expr = ShuntingParser::parse_str(&*strfmt(equation, &fmt_map).unwrap()).expect("Unable to process mafs");
+                                let result = MathContext::new().eval(&expr).unwrap() as f32;
+                                if result > max_value{
+                                    frames[frame_num as usize].insert(knob_name, max_value);
+                                }else if result < min_value{
+                                    frames[frame_num as usize].insert(knob_name, min_value);
+                                }else{
+                                    frames[frame_num as usize].insert(knob_name, result);
                                 }
                             }
                         }
@@ -468,7 +496,7 @@ pub fn parse(fname: &str) {
                             println!("ERROR: no name passed in for {}", error_message);
                         }
                     }
-                    Rule::EOI | Rule::VARY_SDDDD | Rule::VARY_SDDDDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
+                    Rule::EOI | Rule::VARY_SDDDD | Rule::VARY_SDDDDD | Rule::VARY_SDDEDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
                     _ => {
                         println!("{:?} was not implemented :/", command.as_rule());
                     }
