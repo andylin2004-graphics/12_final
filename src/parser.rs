@@ -174,7 +174,6 @@ pub fn parse(fname: &str) {
             }
         }
     }
-    println!("{}", frames.len());
     // pass 2
     for frame_num in 0..frames.len(){
         for pair in commands.clone() {
