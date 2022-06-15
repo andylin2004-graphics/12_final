@@ -154,8 +154,9 @@ pub fn parse(fname: &str) {
                             let min_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start knob value at {}", error_message));
                             let max_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end knob value at {}", error_message));
                             let frame_count = end_frame - start_frame;
-                            let fmt_map = HashMap::new();
+                            let mut fmt_map = HashMap::new();
                             for frame_num in start_frame..=end_frame{
+                                fmt_map.insert("frame_num".to_string(), frame_num);
                                 let expr = ShuntingParser::parse_str(&*strfmt(equation, &fmt_map).unwrap()).expect("Unable to process mafs");
                                 let result = MathContext::new().eval(&expr).unwrap() as f32;
                                 if result > max_value{
@@ -173,6 +174,7 @@ pub fn parse(fname: &str) {
             }
         }
     }
+    println!("{}", frames.len());
     // pass 2
     for frame_num in 0..frames.len(){
         for pair in commands.clone() {
@@ -189,7 +191,7 @@ pub fn parse(fname: &str) {
                         let mut command_contents = command.into_inner();
                         let name = command_contents.next().unwrap().as_str();
                         let vary_value = frames[frame_num].get(command_contents.next().unwrap().as_str()).expect("Unable to get constants");
-                        let constant = Constant::new(command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse().expect(error_message)*vary_value, 0.0, 0.0, 0.0);
+                        let constant = Constant::new(command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, command_contents.next().unwrap().as_str().parse::<f32>().expect(error_message)*vary_value, 0.0, 0.0, 0.0);
                         constants_store.insert(name, constant);
                     }
                     // Rule::CONSTANTS_SDDDDDDDDDDDD => {
@@ -290,7 +292,7 @@ pub fn parse(fname: &str) {
                         );
 
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
@@ -320,7 +322,7 @@ pub fn parse(fname: &str) {
                         );
 
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
@@ -352,7 +354,7 @@ pub fn parse(fname: &str) {
                         );
                         
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
@@ -383,7 +385,7 @@ pub fn parse(fname: &str) {
                         );
 
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
@@ -415,7 +417,7 @@ pub fn parse(fname: &str) {
                         );
 
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
@@ -445,7 +447,7 @@ pub fn parse(fname: &str) {
                             consts::STEP_3D
                         );
                         if let Some(coord_system) = command_contents.next(){
-                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect(format!("Unable to find coordinate system with name {}", coord_system)));
+                            polygons.multiply_matrixes(csystems.get(coord_system.as_str()).expect("Unable to find coordinate system"));
                         }else{
                             polygons.multiply_matrixes(cstack.last().unwrap());
                         }
