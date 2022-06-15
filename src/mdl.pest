@@ -11,6 +11,7 @@ DOUBLE = @{("-"? ~ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+) |
 ("-"? ~ ASCII_DIGIT+ ~ ".") |
 ("-"? ~ ASCII_DIGIT+) |
 ("-"? ~ "." ~ ASCII_DIGIT+)}
+EQUATION = @{(ASCII_ALPHANUMERIC | SYMBOL | PUNCTUATION | "{}")+}
 
 LIGHT = _{"light"}
 LIGHT_SDDDDDD = {LIGHT ~ STRING ~ DOUBLE{6}}
@@ -94,6 +95,7 @@ FRAMES_D = {FRAMES ~ DOUBLE}
 VARY = _{"vary"}
 VARY_SDDDD = {VARY ~ STRING ~ DOUBLE{4}}
 VARY_SDDDDD = {VARY ~ STRING ~ DOUBLE{5}}
+VARY_SDDEDD = {VARY ~ STRING ~ DOUBLE{2} ~ EQUATION ~ DOUBLE{2}}
 
 PPUSH = {"push"}
 PPOP = {"pop"}
@@ -121,6 +123,7 @@ IDENT_LIST = _{
         FRAMES_D |
         VARY_SDDDDD |
         VARY_SDDDD |
+        VARY_SDDEDD |
         LIGHT_SDDDDDD |
         CONSTANTS_SDDDDDDDDDDDD |
         CONSTANTS_SDDDDDDDDD |
