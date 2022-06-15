@@ -12,3 +12,4 @@ clean: clean_anim
 
 clean_anim:
 	rm animation/*.ppm
+	touch animation/dummy.ppm
