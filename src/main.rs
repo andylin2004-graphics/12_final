@@ -35,11 +35,7 @@ pub mod consts {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() > 1 && args[1] == "art"{
-        parse("face.mdl");
-    }else{
-        let time = Instant::now();
-        parse("simple_anim.mdl");
-        println!("Render finished in {:?}", time.elapsed())
-    }
+    let time = Instant::now();
+    parse("spheretification.mdl");
+    println!("Render finished in {:?}", time.elapsed())
 }
